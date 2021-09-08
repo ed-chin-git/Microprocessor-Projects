@@ -1,6 +1,7 @@
 import machine
 import utime
 import micropython
+import sys
 
 class irGetCMD(object):
     def __init__(self, gpioNum):
@@ -25,25 +26,34 @@ class irGetCMD(object):
         self.index += 1
 
     def ir_read(self):
-        utime.sleep_ms(200) 
+        utime.sleep_ms(300) 
         if utime.ticks_diff(
                 utime.ticks_us(),
                 self.start) > 800000 and self.index > 0:
             ir_buffer=[]
             for i in range(3,66,2):
-                if self.logList[i]>800:
-                    ir_buffer.append(1)
-                else:
-                    ir_buffer.append(0)
-            irValue=0x00000000
-            for i in range(0,4):
-                for j in range(0,8):
-                    if ir_buffer[i*8+j]==1:
-                        irValue=irValue<<1
-                        irValue |= 0x01
+                try:
+                    if self.logList[i]>800:
+                        ir_buffer.append(1)
                     else:
-                        irValue=irValue<<1
-                        irValue &= 0xfffffffe                    
+                        ir_buffer.append(0)
+                except Exception as e:
+                    # sys.print_exception(e)
+                    return None
+                irValue=0x00000000
+                for i in range(0,4):
+                    for j in range(0,8):
+                        try:                    
+                            if ir_buffer[i*8+j]==1:
+                                irValue=irValue<<1
+                                irValue |= 0x01
+                            else:
+                                irValue=irValue<<1
+                                irValue &= 0xfffffffe       
+
+                        except Exception as e:
+                            # sys.print_exception(e)
+                            return None                            
             # reset 
             self.logList = []
             self.index = 0

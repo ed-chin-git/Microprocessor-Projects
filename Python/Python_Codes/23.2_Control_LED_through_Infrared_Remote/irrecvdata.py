@@ -28,7 +28,7 @@ class irGetCMD(object):
         utime.sleep_ms(200) 
         if utime.ticks_diff(
                 utime.ticks_us(),
-                self.start) > 800000 and self.index > 0:  #10ms执行一次
+                self.start) > 800000 and self.index > 0:  # 10ms执行一次
             ir_buffer=[]
        
             for i in range(3,66,2):
@@ -50,4 +50,3 @@ class irGetCMD(object):
             self.index = 0
             self.start = 0
             return hex(irValue)
-       
